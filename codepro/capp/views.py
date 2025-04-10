@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 # signup
 
-def signup_view(request):
+def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -23,7 +23,7 @@ def signup_view(request):
 
 # login
 
-def login_view(request):
+def login(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
@@ -48,13 +48,13 @@ def admin_home(request):
     return render(request, 'admin_home.html')
 
 @login_required(login_url='login')
-def home_view(request):
+def home(request):
     return render(request, 'home.html')
 
 
 # logout
 
-def logout_view(request):
+def logout(request):
     if request.method == 'POST':
         logout(request)
         return redirect('login')
