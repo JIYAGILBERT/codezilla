@@ -11,13 +11,13 @@ from django.contrib.auth.decorators import login_required
 
 def signup_view(request):
     if request.method == 'POST':
-        form = UserCreationsForm(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('home')
     else:
-        form = UserCreationsForm()
+        form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
 
@@ -39,7 +39,7 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
-# admin check function
+# # admin check function
 def is_admin(user):
     return user.is_superuser or user.is_staff
 
@@ -50,5 +50,15 @@ def admin_home(request):
 @login_required(login_url='login')
 def home_view(request):
     return render(request, 'home.html')
+
+
+# logout
+
+def logout_view(request):
+    if request.method == 'POST':
+        logout(request)
+        return redirect('login')
+
+
 
 
