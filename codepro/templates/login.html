@@ -1,23 +1,73 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>login</title>
+    <title>CodeZilla - Login</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 <body>
-    <h2>Login</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
+    <div class="login-container">
+        <!-- Left image section -->
+        <div class="left-panel">
+            <div class="logo">
+                <h2><span class="highlight">C</span>ODEZILLA</h2>
+                <p>Test your programming knowledge</p>
+            </div>
+        </div>
 
-    {% if form.errors %}
-        <p style="color: red;">Invalid username or password.</p>
-    {% endif %}
+        <!-- Right login form section -->
+        <div class="right-panel">
+            <h1>Login</h1>
 
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
 
+            <form method="post">
+                {% csrf_token %}
+                <input type="text" name="username" class="form-control" placeholder="Username" required>
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
+                <button type="submit" class="btn btn-login">Log in</button>
+            </form>
 
+            <div class="bottom-links">
+                <a href="{% url 'forgotpassword' %}">Forgot password?</a>
+                <span>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></span>
+            </div>
+
+            <div class="social-login">
+                <div class="divider">Or continue with</div>
+                <div class="social-icons">
+                    <a href="#" class="social-btn btn-google"><i class="fab fa-google"></i></a>
+                    <a href="#" class="social-btn btn-github"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
 </body>
 </html>

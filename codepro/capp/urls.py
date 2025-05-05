@@ -1,12 +1,22 @@
+from django.contrib import admin
 from django.urls import path
-from . import views
-from django.contrib.auth.views import LogoutView
-
+from django.conf import settings
+from django.conf.urls.static import static
+from .import views
 
 urlpatterns = [
-    path('login/', views.login, name='login'),
-    path('signup/', views.signup, name='signup'),
-    path('',views.home, name='home'),
-    path('admin_home/', views.admin_home, name='admin_home'),
-    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('login_view', views.login_view, name='login'),
+    path('adminindex', views.adminindex, name='adminindex'), 
+    path('usersignup', views.signup, name='signup'),
+    path('forgotpassword',views.getusername,name='forgotpassword'),
+    path('verifyotp',views.verifyotp,name='verifyotp'),
+    path('passwordreset',views.passwordreset,name='passwordreset'),
+    path('',views.index,name="index"), 
+    path('logout', views.logoutuser, name="logoutuser"),
+    path('adminlogout/', views.logoutadmin, name='adminlogout'),
+
+    
+    
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
