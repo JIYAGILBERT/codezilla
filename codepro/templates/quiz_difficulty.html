@@ -4,20 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ category.name }} Quiz - CodeZilla</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <title>Select Difficulty - {{ category.name }}</title>
+    <link rel="stylesheet" href="{% static 'css/quiz_difficulty.css' %}">
 </head>
 <body>
     <div class="container">
-        <h1>{{ category.name }} Quiz</h1>
-        <h2>Select Difficulty</h2>
+        <h2>Select Difficulty for {{ category.name }} Quiz</h2>
         <div class="difficulty-options">
-            <a href="{% url 'take_quiz' category.id 'easy' %}" class="btn">Easy</a>
-            <a href="{% url 'take_quiz' category.id 'medium' %}" class="btn">Medium</a>
-            <a href="{% url 'take_quiz' category.id 'hard' %}" class="btn">Hard</a>
+            {% for difficulty, display in difficulty_levels %}
+                <a href="{% url 'take_quiz' category.id difficulty %}" class="btn btn-primary">{{ display }}</a>
+            {% endfor %}
         </div>
-        <a href="{% url 'index' %}" class="btn btn-cancel">Back to Home</a>
+        <a href="{% url 'index' %}" class="btn btn-secondary">Back to Home</a>
     </div>
 </body>
 </html>

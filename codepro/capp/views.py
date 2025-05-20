@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 import random
 from datetime import datetime, timedelta
-from .models import Category, Question, Option
+from .models import Category, Question, Option, UserProfile
 def signup(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -52,8 +52,9 @@ def login_view(request):
             messages.error(request, "Invalid credentials.")
     
     return render(request, 'login.html')
+
 def index(request): 
-    categories = Category.objects.all()
+    categories = Category.objects.filter(published=True)
     context = {
         'categories': categories,
         'no_categories': not categories.exists()
@@ -65,7 +66,8 @@ def adminindex(request):
         messages.error(request, "You need to be logged in as an admin to access this page.")
         return redirect('login')
     categories = Category.objects.all()
-    return render(request, 'adminindex.html', {'categories': categories})
+    questions = Question.objects.all()  # Add questions to context
+    return render(request, 'adminindex.html', {'categories': categories, 'questions': questions})
 
 def logoutuser(request):
     logout(request)
@@ -160,41 +162,64 @@ def passwordreset(request):
 
     return render(request, "passwordreset.html")
 
+# capp/views.py
 def profile(request):
     if not request.user.is_authenticated:
         messages.error(request, "You need to be logged in to access this page.")
         return redirect('login')
-    return render(request, 'profile.html', {'user': request.user})
+    
+    # Get or create UserProfile
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        mobile = request.POST.get('mobile')
+        name = request.POST.get('name')
+        place = request.POST.get('place')
+        
+        # Update User model
+        if username and username != request.user.username:
+            if User.objects.filter(username=username).exclude(id=request.user.id).exists():
+                messages.error(request, "Username already exists.")
+            else:
+                request.user.username = username
+        if email and email != request.user.email:
+            if User.objects.filter(email=email).exclude(id=request.user.id).exists():
+                messages.error(request, "Email already exists.")
+            else:
+                request.user.email = email
+        request.user.save()
+        
+        # Update UserProfile
+        profile.mobile = mobile
+        profile.name = name
+        profile.place = place
+        profile.save()
+        
+        messages.success(request, "Profile updated successfully!")
+        return redirect('profile')
+    
+    return render(request, 'profile.html', {'user': request.user, 'profile': profile})
 
-
+# capp/views.py
 def quiz_difficulty(request, category_id):
-    category = get_object_or_404(Category, id=category_id)
+    category = get_object_or_404(Category, id=category_id, published=True)
     if not request.user.is_authenticated:
         messages.error(request, "Please log in to take the quiz.")
         return redirect('login')
-    return render(request, 'quiz_difficulty.html', {'category': category})
+    context = {
+        'category': category,
+        'difficulty_levels': Question.DIFFICULTY_LEVELS
+    }
+    return render(request, 'quiz_difficulty.html', context)
 def take_quiz(request, category_id, difficulty):
-    try:
-        category = Category.objects.get(id=category_id)
-    except Category.DoesNotExist:
-        messages.error(request, 'Category not found.')
-        return redirect('index')
-
-    # Validate difficulty
-    valid_difficulties = [choice[0] for choice in Question.DIFFICULTY_LEVELS]
-    if difficulty not in valid_difficulties:
-        messages.error(request, 'Invalid difficulty level.')
-        return redirect('index')
-
-    questions = Question.objects.filter(category=category, difficulty=difficulty)
-    if not questions:
-        messages.info(request, f'No {difficulty} questions available for this category.')
-        return redirect('index')
-
-    return render(request, 'take_quiz.html', {'category': category, 'questions': questions, 'difficulty': difficulty})
+    if not request.user.is_authenticated:
+        messages.error(request, "Please log in to take the quiz.")
+        return redirect('login')
     
-    category = get_object_or_404(Category, id=category_id)
-    questions = Question.objects.filter(category=category, difficulty=difficulty)
+    category = get_object_or_404(Category, id=category_id, published=True)
+    questions = Question.objects.filter(category=category, difficulty=difficulty, published=True)
     
     if not questions.exists():
         messages.error(request, "No questions available for this category and difficulty.")
@@ -206,13 +231,46 @@ def take_quiz(request, category_id, difficulty):
         for question in questions:
             selected_option_id = request.POST.get(f'question_{question.id}')
             if selected_option_id:
-                selected_option = Option.objects.get(id=selected_option_id)
-                if selected_option.is_correct:
-                    score += 1
-        messages.success(request, f"Your score: {score}/{total}")
-        return redirect('index')
+                try:
+                    selected_option = Option.objects.get(id=selected_option_id)
+                    if selected_option.is_correct:
+                        score += 1
+                except Option.DoesNotExist:
+                    continue
+        percentage = (score / total) * 100 if total > 0 else 0
+        # Store results in session
+        request.session['quiz_result'] = {
+            'score': score,
+            'total': total,
+            'percentage': percentage
+        }
+        return redirect('quiz_result', category_id=category_id)
     
     return render(request, 'take_quiz.html', {'category': category, 'difficulty': difficulty, 'questions': questions})
+
+def quiz_result(request, category_id):
+    category = get_object_or_404(Category, id=category_id, published=True)
+    # Retrieve results from session
+    quiz_result = request.session.get('quiz_result')
+    if not quiz_result:
+        messages.error(request, "No quiz results found. Please take the quiz again.")
+        return redirect('quiz_difficulty', category_id=category_id)
+    
+    score = quiz_result['score']
+    total = quiz_result['total']
+    percentage = quiz_result['percentage']
+    win_status = percentage >= 60  # Win if percentage is 60% or higher
+    
+    context = {
+        'category': category,
+        'score': score,
+        'total': total,
+        'percentage': round(percentage, 2),
+        'win_status': win_status
+    }
+    # Clean up session
+    del request.session['quiz_result']
+    return render(request, 'quiz_result.html', context)
 
 def manage_questions(request):
     if not request.user.is_superuser:
@@ -222,25 +280,31 @@ def manage_questions(request):
     categories = Category.objects.all()
     questions = Question.objects.all()
     return render(request, 'manage_questions.html', {'categories': categories, 'questions': questions})
+
 def add_question(request):
+    if not request.user.is_superuser:
+        messages.error(request, "You need admin privileges to access this page.")
+        return redirect('index')
+    
     if request.method == 'POST':
         try:
             question_text = request.POST.get('question_text')
             category_id = request.POST.get('category')
-            if not question_text or not category_id:
-                messages.error(request, 'Question text and category are required.')
+            difficulty = request.POST.get('difficulty')
+            if not question_text or not category_id or not difficulty:
+                messages.error(request, 'Question text, category, and difficulty are required.')
                 return redirect('add_question')
 
             category = Category.objects.get(id=category_id)
             question = Question.objects.create(
                 question_text=question_text,
-                category=category
+                category=category,
+                difficulty=difficulty
             )
-            # Add options
             has_correct = False
             for i in range(1, 5):
                 option_text = request.POST.get(f'option{i}')
-                is_correct = request.POST.get(f'is_correct') == str(i)
+                is_correct = request.POST.get('is_correct') == str(i)
                 if option_text:
                     Option.objects.create(
                         question=question,
@@ -250,19 +314,24 @@ def add_question(request):
                     if is_correct:
                         has_correct = True
             if not has_correct:
-                question.delete()  # Roll back if no correct answer is selected
+                question.delete()
                 messages.error(request, 'Please select a correct answer.')
                 return redirect('add_question')
             messages.success(request, 'Question added successfully!')
-            return redirect('manage_questions')
+            return redirect('adminindex')
         except Category.DoesNotExist:
             messages.error(request, 'Selected category does not exist.')
             return redirect('add_question')
         except Exception as e:
             messages.error(request, f'Error adding question: {str(e)}')
             return redirect('add_question')
+    
     categories = Category.objects.all()
-    return render(request, 'add_question.html', {'categories': categories})
+    context = {
+        'categories': categories,
+        'difficulty_levels': Question.DIFFICULTY_LEVELS  # Pass DIFFICULTY_LEVELS to context
+    }
+    return render(request, 'add_question.html', context)
 
 def edit_question(request, question_id):
     question = Question.objects.get(id=question_id)
@@ -317,13 +386,14 @@ def delete_category(request, category_id):
     messages.success(request, "Question deleted successfully.")
     return redirect('manage_questions')
 
+# capp/views.py
 def take_quiz(request, category_id, difficulty):
     if not request.user.is_authenticated:
         messages.error(request, "Please log in to take the quiz.")
         return redirect('login')
     
-    category = get_object_or_404(Category, id=category_id)
-    questions = Question.objects.filter(category=category, difficulty=difficulty)
+    category = get_object_or_404(Category, id=category_id, published=True)
+    questions = Question.objects.filter(category=category, difficulty=difficulty, published=True)
     
     if not questions.exists():
         messages.error(request, "No questions available for this category and difficulty.")
@@ -335,13 +405,23 @@ def take_quiz(request, category_id, difficulty):
         for question in questions:
             selected_option_id = request.POST.get(f'question_{question.id}')
             if selected_option_id:
-                selected_option = Option.objects.get(id=selected_option_id)
-                if selected_option.is_correct:
-                    score += 1
-        messages.success(request, f"Your score: {score}/{total}")
-        return redirect('index')
+                try:
+                    selected_option = Option.objects.get(id=selected_option_id)
+                    if selected_option.is_correct:
+                        score += 1
+                except Option.DoesNotExist:
+                    continue
+        percentage = (score / total) * 100 if total > 0 else 0
+        request.session['quiz_result'] = {
+            'score': score,
+            'total': total,
+            'percentage': percentage
+        }
+        return redirect('quiz_result', category_id=category_id)
     
+    print(f"Difficulty in take_quiz: {difficulty}")  # Debug
     return render(request, 'take_quiz.html', {'category': category, 'difficulty': difficulty, 'questions': questions})
+
 def add_category(request):
     if request.method == 'POST':
         name = request.POST.get('name')
