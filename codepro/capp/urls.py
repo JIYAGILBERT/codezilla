@@ -23,7 +23,7 @@ urlpatterns = [
     path('delete_category/<int:category_id>/', views.delete_category, name='delete_category'),
     path('questions/delete/<int:question_id>/', views.delete_question, name='delete_question'),
     path('categories/add/', views. add_category, name='add_category'),  
- path('quiz/<int:category_id>/result/', views.quiz_result, name='quiz_result'),
+    path('quiz/<int:category_id>/result/', views.quiz_result, name='quiz_result'),
 ]
 
 if settings.DEBUG:

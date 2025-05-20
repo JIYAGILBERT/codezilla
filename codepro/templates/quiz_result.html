@@ -10,6 +10,15 @@
 <body>
     <div class="container">
         <h2>Quiz Result - {{ category.name }}</h2>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         <div class="result">
             <p><strong>Your Score:</strong> {{ score }}/{{ total }}</p>
             <p><strong>Percentage:</strong> {{ percentage }}%</p>

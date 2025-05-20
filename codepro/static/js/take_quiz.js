@@ -9,7 +9,13 @@ function startTimer(duration, display) {
         display.textContent = minutes + ":" + seconds;
         if (--timer < 0) {
             clearInterval(interval);
-            document.getElementById('quiz-form').submit();
+            const form = document.getElementById('quiz-form');
+            if (form) {
+                console.log("Timer expired, submitting form"); // Debug
+                form.submit(); // Ensure form submission
+            } else {
+                console.error("Quiz form not found");
+            }
         }
     }, 1000);
 }

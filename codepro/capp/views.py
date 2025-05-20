@@ -244,14 +244,17 @@ def take_quiz(request, category_id, difficulty):
             'total': total,
             'percentage': percentage
         }
+        print(f"Stored quiz_result: {request.session['quiz_result']}")  # Debug
         return redirect('quiz_result', category_id=category_id)
     
+    print(f"Difficulty in take_quiz: {difficulty}")  # Debug
     return render(request, 'take_quiz.html', {'category': category, 'difficulty': difficulty, 'questions': questions})
 
 def quiz_result(request, category_id):
     category = get_object_or_404(Category, id=category_id, published=True)
     # Retrieve results from session
     quiz_result = request.session.get('quiz_result')
+    print(f"Retrieved quiz_result: {quiz_result}")  # Debug
     if not quiz_result:
         messages.error(request, "No quiz results found. Please take the quiz again.")
         return redirect('quiz_difficulty', category_id=category_id)
@@ -269,7 +272,36 @@ def quiz_result(request, category_id):
         'win_status': win_status
     }
     # Clean up session
-    del request.session['quiz_result']
+    try:
+        del request.session['quiz_result']
+    except KeyError:
+        pass
+    return render(request, 'quiz_result.html', context)
+
+def quiz_result(request, category_id):
+    category = get_object_or_404(Category, id=category_id, published=True)
+    quiz_result = request.session.get('quiz_result')
+    print(f"Retrieved quiz_result: {quiz_result}")  # Debug
+    if not quiz_result:
+        messages.error(request, "No quiz results found. Please take the quiz again.")
+        return redirect('quiz_difficulty', category_id=category_id)
+    
+    score = quiz_result.get('score', 0)
+    total = quiz_result.get('total', 0)
+    percentage = quiz_result.get('percentage', 0)
+    win_status = percentage >= 60
+    
+    context = {
+        'category': category,
+        'score': score,
+        'total': total,
+        'percentage': round(percentage, 2),
+        'win_status': win_status
+    }
+    try:
+        del request.session['quiz_result']
+    except KeyError:
+        pass
     return render(request, 'quiz_result.html', context)
 
 def manage_questions(request):
