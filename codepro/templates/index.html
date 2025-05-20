@@ -5,25 +5,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CodeZilla - Test Your Programming Knowledge</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
-    
 </head>
 <body>
-    <div class="nav">
-        {% if user.is_authenticated %}
-            <a href="{% url 'logoutuser' %}">LOGOUT</a>
-        {% else %}
-            <a href="{% url 'login' %}">SIGN IN / REGISTER</a>
-        {% endif %}
-    </div>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <img src="{% static 'images/codezilla-logo.png' %}" alt="CodeZilla Logo" class="logo">
+            </a>
+            <div class="navbar-links">
+                <a class="nav-link" href="#about">About Us</a>
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="profileDropdown">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        {% if user.is_authenticated %}
+                            <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
+                            <a class="dropdown-item" href="{% url 'logoutuser' %}">Logout</a>
+                        {% else %}
+                            <a class="dropdown-item" href="{% url 'login' %}">Login</a>
+                            <a class="dropdown-item" href="{% url 'signup' %}">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
+    <!-- Hero Section -->
     <div class="hero">
-        <div class="hero-content">
-            <p class="brand">CODEZILLA</p>
-            <h1>TEST YOUR PROGRAMMING <br> KNOWLEDGE NOW!!</h1>
-            <p class="subtext">Challenge yourself with our quizzes.</p>
-            <a href="#" class="btn">START QUIZ</a>
+        <div class="container">
+            <h1>Test Your Programming Knowledge with <strong>CodeZilla</strong></h1>
+            <p class="lead">Challenge yourself with our interactive programming quizzes designed for developers of all skill levels.</p>
+            <a href="{% if user.is_authenticated %}#quiz-section{% else %}{% url 'login' %}{% endif %}" class="btn btn-primary btn-lg">PLAY !</a>
         </div>
     </div>
+
+    <!-- Quiz Section -->
+    <section id="quiz-section" class="quiz-section">
+        <div class="container">
+            <h2>Choose Your Favorite</h2>
+            {% if no_categories %}
+                <p>No quiz categories available at the moment. Please check back later!</p>
+            {% else %}
+                <div class="quiz-grid">
+                    {% for category in categories %}
+                        <div class="quiz-card">
+                            <div class="card-header">
+                                <span class="category-icon">
+                                    <i class="fas fa-code"></i>
+                                </span>
+                                <h5 class="card-title">{{ category.name }} Quiz</h5>
+                            </div>
+                            <div class="card-image">
+                                <img src="{% if category.image %}{{ category.image.url }}{% else %}{% static 'images/category-placeholder.png' %}{% endif %}" alt="{{ category.name }}">
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{ category.description|default:"Test your skills with this quiz." }}</p>
+                                <div class="card-actions">
+                                    <a href="{% if user.is_authenticated %}{% url 'quiz_difficulty' category.id %}{% else %}{% url 'login' %}?next={% url 'quiz_difficulty' category.id %}{% endif %}" class="btn btn-primary">Start</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
 </body>
 </html>

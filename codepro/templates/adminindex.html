@@ -4,13 +4,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/index.css' %}">
-    <title>index</title>
+    <title>CodeZilla - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
 </head>
 <body>
+    <!-- Side Navbar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <img src="{% static 'images/codezilla-logo.png' %}" alt="CodeZilla Logo" class="logo">
+            </a>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{% url 'add_category' %}" class="sidebar-link">
+                    <i class="fas fa-plus"></i> Add Category
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{% url 'add_question' %}" class="sidebar-link">
+                    <i class="fas fa-question-circle"></i> Add Quiz
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{% url 'adminlogout' %}" class="sidebar-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
 
-    <h1>hello</h1>
-    <a href="{% url 'adminlogout' %}"><button>Logout</button></a>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="hero">
+            <div class="container">
+                <h1>Admin Dashboard</h1>
+                <p class="lead">Manage quizzes and categories with ease.</p>
+            </div>
+        </div>
 
+        <div class="container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <section class="quiz-section">
+                <h2>Quiz Categories</h2>
+                {% if categories %}
+                    <div class="quiz-grid">
+                        {% for category in categories %}
+                            <div class="quiz-card">
+                                <div class="card-header">
+                                    <span class="category-icon">
+                                        <i class="fas fa-code"></i>
+                                    </span>
+                                    <h5 class="card-title">{{ category.name }} Quiz</h5>
+                                </div>
+                                <div class="card-image">
+                                    <img src="{% if category.image %}{{ category.image.url }}{% else %}{% static 'images/category-placeholder.png' %}{% endif %}" alt="{{ category.name }}">
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">{{ category.description|default:"Test your skills with this quiz." }}</p>
+                                    <div class="card-actions">
+                                        <a href="{% url 'edit_category' category.id %}" class="btn btn-edit">Edit</a>
+                                        <a href="{% url 'delete_category' category.id %}" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this category?')">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No quiz categories available. Add categories using the sidebar.</p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+        }, 5000);
+    </script>
 </body>
 </html>

@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Category - CodeZilla</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Category</h1>
+        <form action="{% url 'edit_category' category.id %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="categoryName">Category Name</label>
+                <input type="text" id="categoryName" name="name" value="{{ category.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="categoryDesc">Description</label>
+                <textarea id="categoryDesc" name="description">{{ category.description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="categoryImage">Category Image</label>
+                <input type="file" id="categoryImage" name="image" accept="image/*">
+                {% if category.image %}
+                    <p>Current Image: <img src="{{ category.image.url }}" alt="{{ category.name }}" style="max-width: 100px;"></p>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn">Update</button>
+            <a href="{% url 'adminindex' %}" class="btn">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>

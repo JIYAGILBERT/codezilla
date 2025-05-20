@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Question - CodeZilla</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Add New Question</h1>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% if categories %}
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="question_text">Question:</label>
+                    <input type="text" name="question_text" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category:</label>
+                    <select name="category" required>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Options:</label>
+                    {% for i in "1234" %}
+                        <div>
+                            <input type="text" name="option{{ i }}" placeholder="Option {{ i }}" required>
+                            <input type="radio" name="is_correct" value="{{ i }}" {% if forloop.first %}required{% endif %}> Correct
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn">Add Question</button>
+                <a href="{% url 'adminindex' %}" class="btn btn-cancel">Cancel</a>
+            </form>
+        {% else %}
+            <p>No categories available. Please <a href="{% url 'add_category' %}">add a category</a> first.</p>
+            <a href="{% url 'adminindex' %}" class="btn">Back to Dashboard</a>
+        {% endif %}
+    </div>
+    <script>
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+        }, 5000);
+    </script>
+</body>
+</html>

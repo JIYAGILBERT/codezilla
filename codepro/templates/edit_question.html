@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeZilla - Edit Question</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <img src="{% static 'images/codezilla-logo.png' %}" alt="CodeZilla Logo" class="logo">
+            </a>
+            <div class="navbar-links">
+                <a class="nav-link" href="#about">About Us</a>
+                <a class="nav-link" href="{% url 'adminindex' %}">Dashboard</a>
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="profileDropdown">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
+                        <a class="dropdown-item" href="{% url 'adminlogout' %}">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Edit Question</h1>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <form method="POST" class="question-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select name="category" id="category" required>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category.id == question.category.id %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="text">Question Text</label>
+                <textarea name="text" id="text" required>{{ question.text }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="difficulty">Difficulty</label>
+                <select name="difficulty" id="difficulty" required>
+                    <option value="easy" {% if question.difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                    <option value="medium" {% if question.difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="hard" {% if question.difficulty == 'hard' %}selected{% endif %}>Hard</option>
+                </select>
+            </div>
+            {% for option in question.options.all %}
+                <div class="form-group">
+                    <label for="option{{ forloop.counter }}">Option {{ forloop.counter }}</label>
+                    <input type="text" name="option{{ forloop.counter }}" id="option{{ forloop.counter }}" value="{{ option.text }}" required>
+                </div>
+            {% endfor %}
+            {% if question.options.count < 5 %}
+                <div class="form-group">
+                    <label for="option5">Option 5</label>
+                    <input type="text" name="option5" id="option5" required>
+                </div>
+            {% endif %}
+            <div class="form-group">
+                <label for="correct_option">Correct Option</label>
+                <select name="correct_option" id="correct_option" required>
+                    {% for option in question.options.all %}
+                        <option value="{{ forloop.counter }}" {% if option.is_correct %}selected{% endif %}>Option {{ forloop.counter }}</option>
+                    {% endfor %}
+                    {% if question.options.count < 5 %}
+                        <option value="5">Option 5</option>
+                    {% endif %}
+                </select>
+            </div>
+            <button type="submit" class="btn">Update Question</button>
+            <a href="{% url 'manage_questions' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+
+    <script>
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+        }, 5000);
+    </script>
+</body>
+</html>
