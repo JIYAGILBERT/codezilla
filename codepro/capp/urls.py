@@ -4,26 +4,21 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
-    path('login_view', views.login_view, name='login'),
-    path('adminindex', views.adminindex, name='adminindex'), 
-    path('usersignup', views.signup, name='signup'),
-    path('forgotpassword', views.getusername, name='forgotpassword'),
-    path('verifyotp', views.verifyotp, name='verifyotp'),
-    path('passwordreset', views.passwordreset, name='passwordreset'),
-    path('', views.index, name="index"), 
-    path('logout', views.logoutuser, name="logoutuser"),
-    path('adminlogout/', views.logoutadmin, name='adminlogout'),
-    path('profile/', views.profile, name='profile'),
-    path('quiz/<int:category_id>/', views.quiz_difficulty, name='quiz_difficulty'),
-    path('quiz/<int:category_id>/<str:difficulty>/', views.take_quiz, name='take_quiz'),
-    path('questions/', views.manage_questions, name='manage_questions'),
-    path('questions/add/', views.add_question, name='add_question'),
-    path('questions_edit/<int:question_id>/', views.edit_question, name='edit_question'),
-    path('edit_category/<int:category_id>/', views.edit_category, name='edit_category'),
-    path('delete_category/<int:category_id>/', views.delete_category, name='delete_category'),
-    path('questions/delete/<int:question_id>/', views.delete_question, name='delete_question'),
-    path('categories/add/', views. add_category, name='add_category'),  
-    path('quiz/<int:category_id>/result/', views.quiz_result, name='quiz_result'),
+    path('', views.home, name='home'),
+    path('signup/', views.signup, name='signup'),
+    path('login/', views.user_login, name='login'),
+    path('logout/', views.user_logout, name='logout'),
+    path('userindex/', views.userindex, name='userindex'),
+    path('quiz/', views.quiz_page, name='quiz_page'),
+    path('quiz/<str:category>/', views.select_difficulty, name='select_difficulty'),  # New URL
+    path('quiz/difficulty/<str:difficulty>/', views.quiz_page, name='quiz_page_difficulty'),
+    path('quiz/<str:category>/<str:difficulty>/', views.quiz_page, name='quiz_page_category_difficulty'),
+    path('result/', views.result, name='result'),
+    path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('add_question/', views.add_question, name='add_question'),
+    path('edit_question/<int:question_id>/', views.edit_question, name='edit_question'),
+    path('delete_question/<int:question_id>/', views.delete_question, name='delete_question'),
+    path('delete_category/<str:category>/', views.delete_category, name='delete_category'),
 ]
 
 if settings.DEBUG:

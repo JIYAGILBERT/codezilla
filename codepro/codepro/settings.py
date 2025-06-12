@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # 'allauth.socialaccount.providers.linkedin_oauth2',
     'capp',
     'verify_email',
+    # 'bootstrap5',
 
 ]
 

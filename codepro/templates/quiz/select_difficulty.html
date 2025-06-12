@@ -1,0 +1,15 @@
+{% extends 'quiz/base.html' %}
+{% block content %}
+<h2>Select Difficulty for {{ category }} Quiz</h2>
+<p>Choose a difficulty level to start the quiz:</p>
+<ul>
+    {% for difficulty in difficulties %}
+        <li>
+            <a href="{% url 'quiz_page_category_difficulty' category difficulty.0 %}" class="btn btn-primary">
+                {{ difficulty.0 }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'userindex' %}" class="btn btn-secondary">Back to Home</a>
+{% endblock %}

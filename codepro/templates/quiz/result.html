@@ -1,0 +1,23 @@
+{% extends 'quiz/base.html' %}
+{% block content %}
+<h2>Quiz Results</h2>
+<div class="card">
+    <div class="card-body">
+        {% if attempt.category and attempt.difficulty %}
+            <p><strong>Quiz:</strong> {{ attempt.category }} - {{ attempt.difficulty }}</p>
+        {% elif attempt.category %}
+            <p><strong>Quiz:</strong> {{ attempt.category }}</p>
+        {% elif attempt.difficulty %}
+            <p><strong>Quiz:</strong> {{ attempt.difficulty }}</p>
+        {% else %}
+            <p><strong>Quiz:</strong> General</p>
+        {% endif %}
+        <p><strong>Score:</strong> {{ attempt.score }}/{{ attempt.total_questions }}</p>
+        <p><strong>Percentage:</strong> {{ attempt.percentage }}%</p>
+        <p><strong>Time Taken:</strong> {{ attempt.time_taken|floatformat:2 }} seconds</p>
+        <p><strong>Correct Answers:</strong> {{ attempt.correct_answers }}</p>
+        <p><strong>Wrong Answers:</strong> {{ attempt.wrong_answers }}</p>
+    </div>
+</div>
+<a href="{% url 'userindex' %}" class="btn btn-primary mt-3">Take Another Quiz</a>
+{% endblock %}

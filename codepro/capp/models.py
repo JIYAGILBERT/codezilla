@@ -1,43 +1,35 @@
-# capp/models.py
 from django.db import models
 from django.contrib.auth.models import User
 
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    image = models.ImageField(upload_to='category_images/', blank=True, null=True)
-    published = models.BooleanField(default=True)  # New field
-
-    def __str__(self):
-        return self.name
-
 class Question(models.Model):
     DIFFICULTY_LEVELS = (
-        ('easy', 'Easy'),
-        ('medium', 'Medium'),
-        ('hard', 'Hard'),
+        ('Easy', 'Easy'),
+        ('Medium', 'Medium'),
+        ('Hard', 'Hard'),
     )
-    question_text = models.CharField(max_length=255)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions')
-    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_LEVELS, default='medium')
-    published = models.BooleanField(default=True)  # New field
-
-    def __str__(self):
-        return self.question_text
-
-class Option(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
-    text = models.CharField(max_length=255)
-    is_correct = models.BooleanField(default=False)
+    text = models.TextField()
+    option1 = models.CharField(max_length=200)
+    option2 = models.CharField(max_length=200)
+    option3 = models.CharField(max_length=200)
+    option4 = models.CharField(max_length=200)
+    correct_option = models.IntegerField()
+    category = models.CharField(max_length=100, default="General")
+    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_LEVELS, default='Easy')  # New difficulty field
 
     def __str__(self):
         return self.text
-    
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    mobile = models.CharField(max_length=15, blank=True, null=True)
-    name = models.CharField(max_length=100, blank=True, null=True)
-    place = models.CharField(max_length=100, blank=True, null=True)
+
+class QuizAttempt(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    score = models.IntegerField()
+    time_taken = models.FloatField()
+    total_questions = models.IntegerField()
+    correct_answers = models.IntegerField()
+    wrong_answers = models.IntegerField()
+    percentage = models.FloatField()
+    attempted_at = models.DateTimeField(auto_now_add=True)
+    category = models.CharField(max_length=100, null=True, blank=True)
+    difficulty = models.CharField(max_length=10, choices=Question.DIFFICULTY_LEVELS, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.username}'s Profile"
+        return f"{self.user.username}'s attempt at {self.attempted_at}"

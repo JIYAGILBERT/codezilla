@@ -1,0 +1,49 @@
+{% extends 'quiz/base.html' %}
+{% block content %}
+<h2>Add New Question</h2>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="category" class="form-label">Category</label>
+        <input type="text" class="form-control" id="category" name="category" required placeholder="e.g., Python">
+    </div>
+    <div class="mb-3">
+        <label for="difficulty" class="form-label">Difficulty</label>
+        <select class="form-select" id="difficulty" name="difficulty" required>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="text" class="form-label">Question Text</label>
+        <textarea class="form-control" id="text" name="text" required></textarea>
+    </div>
+    <div class="mb-3">
+        <label for="option1" class="form-label">Option 1</label>
+        <input type="text" class="form-control" id="option1" name="option1" required>
+    </div>
+    <div class="mb-3">
+        <label for="option2" class="form-label">Option 2</label>
+        <input type="text" class="form-control" id="option2" name="option2" required>
+    </div>
+    <div class="mb-3">
+        <label for="option3" class="form-label">Option 3</label>
+        <input type="text" class="form-control" id="option3" name="option3" required>
+    </div>
+    <div class="mb-3">
+        <label for="option4" class="form-label">Option 4</label>
+        <input type="text" class="form-control" id="option4" name="option4" required>
+    </div>
+    <div class="mb-3">
+        <label for="correct_option" class="form-label">Correct Option</label>
+        <select class="form-select" id="correct_option" name="correct_option" required>
+            <option value="1">Option 1</option>
+            <option value="2">Option 2</option>
+            <option value="3">Option 3</option>
+            <option value="4">Option 4</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Question</button>
+</form>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'quiz/base.html' %}
+{% block content %}
+<h2>Welcome, {{ user.username }}!</h2>
+<p>Ready to test your knowledge? Choose a quiz below:</p>
+
+{% comment %} <h3>General Quiz</h3>
+<ul>
+    <li><a href="{% url 'quiz_page' %}" class="btn btn-primary">All Questions</a></li>
+</ul> {% endcomment %}
+
+<h3>By Category</h3>
+<ul>
+    {% for category in categories %}
+        <li><a href="{% url 'select_difficulty' category.category %}" class="btn btn-primary">{{ category.category }}</a></li>
+    {% endfor %}
+</ul>
+
+{% comment %} <h3>By Difficulty</h3>
+<ul>
+    {% for difficulty in difficulties %}
+        <li><a href="{% url 'quiz_page_difficulty' difficulty.0 %}" class="btn btn-primary">{{ difficulty.0 }}</a></li>
+    {% endfor %}
+</ul> {% endcomment %}
+{% endblock %}
