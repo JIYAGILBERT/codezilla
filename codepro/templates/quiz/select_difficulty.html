@@ -1,15 +1,90 @@
-{% extends 'quiz/base.html' %}
-{% block content %}
-<h2>Select Difficulty for {{ category }} Quiz</h2>
-<p>Choose a difficulty level to start the quiz:</p>
-<ul>
-    {% for difficulty in difficulties %}
-        <li>
-            <a href="{% url 'quiz_page_category_difficulty' category difficulty.0 %}" class="btn btn-primary">
-                {{ difficulty.0 }}
+<!-- {% extends 'quiz/base.html' %}
+{% block content %} -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Difficulty - {{ category }} Quiz</title>
+    <!-- Google Fonts: Poppins and Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h2 {
+            font-family: 'Poppins', sans-serif;
+        }
+        .custom-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .button-glow:hover {
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.5);
+        }
+        .section-slide {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl w-full space-y-8 bg-white rounded-3xl custom-shadow p-10 transform hover:scale-101 transition-transform duration-300 section-slide">
+        <!-- Header Section -->
+        <div class="text-center">
+            <h2 class="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight animate-pulse">
+                Select Difficulty for {{ category }} Quiz
+            </h2>
+            <p class="mt-4 text-lg text-gray-600 font-medium leading-relaxed">
+                Choose a difficulty level to start your quiz adventure!
+            </p>
+        </div>
+
+        <!-- Difficulty Selection Section -->
+        <div class="bg-indigo-100 p-8 rounded-xl custom-shadow section-slide">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for difficulty in difficulties %}
+                    <a href="{% url 'quiz_page_category_difficulty' category difficulty.0 %}" 
+                       class="block px-6 py-4 bg-indigo-600 text-white text-center rounded-xl button-glow hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-400 transform hover:-translate-y-1 transition duration-300 text-base font-medium">
+                        {{ difficulty.0 }}
+                    </a>
+                {% empty %}
+                    <p class="text-center text-gray-500 col-span-full text-lg">No difficulty levels available.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Back to Home Button -->
+        <div class="flex justify-center">
+            <a href="{% url 'userindex' %}" 
+               class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-full text-white bg-gray-600 hover:bg-gray-700 button-glow focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-gray-400 transform hover:-translate-y-1 transition duration-300">
+                Back to Home
             </a>
-        </li>
-    {% endfor %}
-</ul>
-<a href="{% url 'userindex' %}" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+
+    <!-- JavaScript for Button Animations -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttons = document.querySelectorAll('a[href]');
+            buttons.forEach(button => {
+                button.addEventListener('mouseover', () => {
+                    button.classList.add('animate-pulse');
+                    setTimeout(() => button.classList.remove('animate-pulse'), 500);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
 {% endblock %}

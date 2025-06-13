@@ -1,23 +1,119 @@
-{% extends 'quiz/base.html' %}
+<!-- {% extends 'quiz/base.html' %}
+{% load static %} -->
 {% block content %}
-<h2>Quiz Results</h2>
-<div class="card">
-    <div class="card-body">
-        {% if attempt.category and attempt.difficulty %}
-            <p><strong>Quiz:</strong> {{ attempt.category }} - {{ attempt.difficulty }}</p>
-        {% elif attempt.category %}
-            <p><strong>Quiz:</strong> {{ attempt.category }}</p>
-        {% elif attempt.difficulty %}
-            <p><strong>Quiz:</strong> {{ attempt.difficulty }}</p>
-        {% else %}
-            <p><strong>Quiz:</strong> General</p>
-        {% endif %}
-        <p><strong>Score:</strong> {{ attempt.score }}/{{ attempt.total_questions }}</p>
-        <p><strong>Percentage:</strong> {{ attempt.percentage }}%</p>
-        <p><strong>Time Taken:</strong> {{ attempt.time_taken|floatformat:2 }} seconds</p>
-        <p><strong>Correct Answers:</strong> {{ attempt.correct_answers }}</p>
-        <p><strong>Wrong Answers:</strong> {{ attempt.wrong_answers }}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <!-- Google Fonts: Poppins and Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h2 {
+            font-family: 'Poppins', sans-serif;
+        }
+        .custom-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .button-glow:hover {
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.5);
+        }
+        .section-slide {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .result-card {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border-radius: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl w-full space-y-8 bg-white rounded-3xl custom-shadow p-10 transform hover:scale-101 transition-transform duration-300 section-slide">
+        <!-- Header Section -->
+        <div class="text-center">
+            <h2 class="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight animate-pulse">
+                Quiz Results
+            </h2>
+            <p class="mt-4 text-lg text-gray-600 font-medium leading-relaxed">
+                Here's how you did! Ready for another challenge?
+            </p>
+        </div>
+
+        <!-- Results Section -->
+        <div class="result-card p-8 rounded-xl custom-shadow section-slide">
+            <div class="space-y-4">
+                <div class="result-item">
+                    <span class="text-lg font-medium">Quiz:</span>
+                    <span class="text-lg">
+                        {% if attempt.category and attempt.difficulty %}
+                            {{ attempt.category }} - {{ attempt.difficulty }}
+                        {% elif attempt.category %}
+                            {{ attempt.category }}
+                        {% elif attempt.difficulty %}
+                            {{ attempt.difficulty }}
+                        {% else %}
+                            General
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="result-item">
+                    <span class="text-lg font-medium">Score:</span>
+                    <span class="text-lg">{{ attempt.score }}/{{ attempt.total_questions }}</span>
+                </div>
+                <div class="result-item">
+                    <span class="text-lg font-medium">Percentage:</span>
+                    <span class="text-lg">{{ attempt.percentage }}%</span>
+                </div>
+                <div class="result-item">
+                    <span class="text-lg font-medium">Time Taken:</span>
+                    <span class="text-lg">{{ attempt.time_taken|floatformat:2 }} seconds</span>
+                </div>
+                <div class="result-item">
+                    <span class="text-lg font-medium">Correct Answers:</span>
+                    <span class="text-lg">{{ attempt.correct_answers }}</span>
+                </div>
+                <div class="result-item">
+                    <span class="text-lg font-medium">Wrong Answers:</span>
+                    <span class="text-lg">{{ attempt.wrong_answers }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Take Another Quiz Button -->
+        <div class="flex justify-center">
+            <a href="{% url 'userindex' %}" 
+               class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-full text-white bg-indigo-600 hover:bg-indigo-700 button-glow focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-400 transform hover:-translate-y-1 transition duration-300">
+                Take Another Quiz
+            </a>
+        </div>
     </div>
-</div>
-<a href="{% url 'userindex' %}" class="btn btn-primary mt-3">Take Another Quiz</a>
+</body>
+</html>
 {% endblock %}

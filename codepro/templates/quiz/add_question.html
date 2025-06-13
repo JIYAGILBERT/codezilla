@@ -1,49 +1,78 @@
-{% extends 'quiz/base.html' %}
-{% block content %}
-<h2>Add New Question</h2>
-<form method="post">
-    {% csrf_token %}
-    <div class="mb-3">
-        <label for="category" class="form-label">Category</label>
-        <input type="text" class="form-control" id="category" name="category" required placeholder="e.g., Python">
+<!-- {% extends 'quiz/base.html' %}
+{% block content %} -->
+<div class="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 flex justify-center items-center">
+    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-lg w-full transform hover:scale-101 transition-transform duration-300">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Add New Question</h2>
+        <form method="post" action="{% url 'add_question' %}" class="space-y-4">
+            {% csrf_token %}
+            {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                        <div class="text-sm {% if message.tags == 'error' %}text-red-600{% else %}text-green-600{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div>
+                <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                <input type="text" id="category" name="category" required placeholder="e.g., Python"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200">
+            </div>
+            <div>
+                <label for="difficulty" class="block text-sm font-medium text-gray-700">Difficulty</label>
+                <select id="difficulty" name="difficulty" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200">
+                    <option value="" disabled selected>Select difficulty</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+            <div>
+                <label for="text" class="block text-sm font-medium text-gray-700">Question Text</label>
+                <textarea id="text" name="text" required
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200"
+                          rows="4"></textarea>
+            </div>
+            <div>
+                <label for="option1" class="block text-sm font-medium text-gray-700">Option 1</label>
+                <input type="text" id="option1" name="option1" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200">
+            </div>
+            <div>
+                <label for="option2" class="block text-sm font-medium text-gray-700">Option 2</label>
+                <input type="text" id="option2" name="option2" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200">
+            </div>
+            <div>
+                <label for="option3" class="block text-sm font-medium text-gray-700">Option 3</label>
+                <input type="text" id="option3" name="option3" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200">
+            </div>
+            <div>
+                <label for="option4" class="block text-sm font-medium text-gray-700">Option 4</label>
+                <input type="text" id="option4" name="option4" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200">
+            </div>
+            <div>
+                <label for="correct_option" class="block text-sm font-medium text-gray-700">Correct Option</label>
+                <select id="correct_option" name="correct_option" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200">
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                    <option value="4">Option 4</option>
+                </select>
+            </div>
+            <button type="submit"
+                    class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200">
+                Add Question
+            </button>
+        </form>
     </div>
-    <div class="mb-3">
-        <label for="difficulty" class="form-label">Difficulty</label>
-        <select class="form-select" id="difficulty" name="difficulty" required>
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
-        </select>
-    </div>
-    <div class="mb-3">
-        <label for="text" class="form-label">Question Text</label>
-        <textarea class="form-control" id="text" name="text" required></textarea>
-    </div>
-    <div class="mb-3">
-        <label for="option1" class="form-label">Option 1</label>
-        <input type="text" class="form-control" id="option1" name="option1" required>
-    </div>
-    <div class="mb-3">
-        <label for="option2" class="form-label">Option 2</label>
-        <input type="text" class="form-control" id="option2" name="option2" required>
-    </div>
-    <div class="mb-3">
-        <label for="option3" class="form-label">Option 3</label>
-        <input type="text" class="form-control" id="option3" name="option3" required>
-    </div>
-    <div class="mb-3">
-        <label for="option4" class="form-label">Option 4</label>
-        <input type="text" class="form-control" id="option4" name="option4" required>
-    </div>
-    <div class="mb-3">
-        <label for="correct_option" class="form-label">Correct Option</label>
-        <select class="form-select" id="correct_option" name="correct_option" required>
-            <option value="1">Option 1</option>
-            <option value="2">Option 2</option>
-            <option value="3">Option 3</option>
-            <option value="4">Option 4</option>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Add Question</button>
-</form>
+</div>
+
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
 {% endblock %}
